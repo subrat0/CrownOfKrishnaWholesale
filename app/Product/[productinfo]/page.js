@@ -10,18 +10,36 @@ const Page = () => {
 
   const params = useParams();
   const { productinfo } = params;
+
+  //router ka use krke next and previous product dikhana
+  const router = useRouter();
+
+  //all hooks and states
+  // Check if cart has items
+  const [hasCartItems, setHasCartItems] = useState(false);
+  const [currentImage, setCurrentImage] = useState(0);
+  // State for quantity
+  const [quantity, setQuantity] = useState(1);
+  const [showNotification, setShowNotification] = useState(false);
+  // ye functionality handle prev ke liye hai
+  const [prevClicked, setPrevClicked] = useState(false);
+  const [nextClicked, setNextClicked] = useState(false);
+
+  const [isAdding, setIsAdding] = useState(false);
+
+  const [isLoadingPrev, setIsLoadingPrev] = useState(false);
+  const [isLoadingNext, setIsLoadingNext] = useState(false);
+
+  const [isLoadingViewCart, setIsLoadingViewCart] = useState(false); // New state for View Cart loading
+
+
+
+
   const product = products.find((p) => p.id === productinfo);
 
   if (!product) return <div className="text-white text-4xl flex flex-col justify-center items-center border rounded-2xl mx-auto p-4 font-bold w-fit">Product not found
     <Link href="/" className="text-blue-500 no-underline border-2 p-2 rounded-2xl my-2 hover:bg-black hover:text-white">Go Back</Link>
   </div>;
-
-
-  const [currentImage, setCurrentImage] = useState(0);
-
-  // State for quantity
-  const [quantity, setQuantity] = useState(1);
-  const [showNotification, setShowNotification] = useState(false);
 
   const handleNext = () => {
     if (currentImage < product.images.length - 1) {
@@ -35,9 +53,6 @@ const Page = () => {
     }
   };
 
-  // ye functionality handle prev ke liye hai
-  const [prevClicked, setPrevClicked] = useState(false);
-  const [nextClicked, setNextClicked] = useState(false);
 
   const handlePrevClick = () => {
     handlePrev();
@@ -105,7 +120,6 @@ const Page = () => {
     }
   };
 
-  const [isAdding, setIsAdding] = useState(false);
 
   const handleAddToCart = () => {
     setIsAdding(true);
@@ -137,14 +151,11 @@ const Page = () => {
   }, [showNotification]);
 
 
-  //router ka use krke next and previous product dikhana
-  const router = useRouter();
+
   const currentIndex = products.findIndex((p) => p.id === productinfo);
   const prevProductId = products[currentIndex > 0 ? currentIndex - 1 : products.length - 1]?.id;
   const nextProductId = products[currentIndex < products.length - 1 ? currentIndex + 1 : 0]?.id;
 
-  const [isLoadingPrev, setIsLoadingPrev] = useState(false);
-  const [isLoadingNext, setIsLoadingNext] = useState(false);
 
   const handlePrevProduct = () => {
     setIsLoadingPrev(true);
@@ -157,16 +168,12 @@ const Page = () => {
   };
 
 
-  const [isLoadingViewCart, setIsLoadingViewCart] = useState(false); // New state for View Cart loading
 
   // Handler for View Cart button
   const handleViewCart = () => {
     setIsLoadingViewCart(true);
     router.push('/cart');
   };
-
-  // Check if cart has items
-  const [hasCartItems, setHasCartItems] = useState(false);
 
   // Check cart on mount and after adding to cart
   useEffect(() => {
@@ -263,29 +270,6 @@ const Page = () => {
                 </button>
               )}
             </div>
-
-            {/* This code is for mobile phone in future*/}
-            {/* <div className="flex flex-col items-center border border-yellow-500 rounded-2xl p-2"> */}
-            {/* Horizontal Scrollable Gallery */}
-            {/* <div
-              className="w-full h-[400px] flex overflow-x-auto snap-x snap-mandatory scroll-smooth rounded-4xl shadow-lg relative p-3 scrollbar-hide"
-            >
-              {product.images.map((img, index) => (
-                <div
-                  key={index}
-                  className="flex-shrink-0 w-full h-full flex items-center justify-center snap-center"
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.title} ${index + 1}`}
-                    width={500}
-                    height={500}
-                    className="object-contain rounded-3xl border-red-600"
-                  />
-                </div>
-              ))}
-            </div>
-          </div> */}
 
             {/* Thumbnails */}
             <div className="flex gap-3 mt-4 overflow-x-auto max-w-full pb-2 scrollbar-hide">
