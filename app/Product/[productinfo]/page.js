@@ -10,27 +10,10 @@ const Page = () => {
   const { productinfo } = params;
   const router = useRouter();
 
-  const product = products.find((p) => p.id === productinfo);
-
-  if (!product)
-    return (
-      <div className="text-white text-4xl flex flex-col justify-center items-center border rounded-2xl mx-auto p-4 font-bold w-fit">
-        Product not found
-        <Link
-          href="/"
-          className="text-blue-500 no-underline border-2 p-2 rounded-2xl my-2 hover:bg-black hover:text-white"
-        >
-          Go Back
-        </Link>
-      </div>
-    );
-
   // STATES
   const [currentImage, setCurrentImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [selectedSize, setSelectedSize] = useState(
-    product.category === "posag" && product.sizes ? product.sizes[0] : null
-  );
+ 
   const [showNotification, setShowNotification] = useState(false);
   const [hasCartItems, setHasCartItems] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
@@ -40,6 +23,10 @@ const Page = () => {
 
   const [prevClicked, setPrevClicked] = useState(false);
   const [nextClicked, setNextClicked] = useState(false);
+
+   const [selectedSize, setSelectedSize] = useState(
+    product.category === "posag" && product.sizes ? product.sizes[0] : null
+  );
 
   // FUNCTIONS
   const handleSizeClick = (sizeObj) => {
@@ -108,6 +95,21 @@ const Page = () => {
   const calculateDiscount = (mrp, price) => Math.round(((mrp - price) / mrp) * 100);
 
   const getBlurDataURL = (imgSrc) => imgSrc; // Optional: use same image for blur
+  
+
+  const product = products.find((p) => p.id === productinfo);
+   if (!product)
+    return (
+      <div className="text-white text-4xl flex flex-col justify-center items-center border rounded-2xl mx-auto p-4 font-bold w-fit">
+        Product not found
+        <Link
+          href="/"
+          className="text-blue-500 no-underline border-2 p-2 rounded-2xl my-2 hover:bg-black hover:text-white"
+        >
+          Go Back
+        </Link>
+      </div>
+    );
 
   return (
     <>
