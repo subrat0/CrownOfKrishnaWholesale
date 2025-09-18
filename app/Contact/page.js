@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -7,6 +7,12 @@ export default function Contact() {
     contact: "",
     message: "",
   });
+  const [isClient, setIsClient] = useState(false); // SSR safe
+
+  // Only set true on client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -15,16 +21,23 @@ export default function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    if (!isClient) return; // safety check
+
     // WhatsApp Redirect
-    const whatsappUrl = `https://wa.me/917017714167?text=Name:%20${formData.name}%0AContact:%20${formData.contact}%0AMessage:%20${formData.message}`;
+    const whatsappUrl = `https://wa.me/917017714167?text=Name:%20${encodeURIComponent(
+      formData.name
+    )}%0AContact:%20${encodeURIComponent(
+      formData.contact
+    )}%0AMessage:%20${encodeURIComponent(formData.message)}`;
+
     window.open(whatsappUrl, "_blank");
 
-    // TODO: EmailJS integration (for email send)
+    // Feedback for user
     alert("Your details have been sent to WhatsApp.");
   };
 
   return (
-    <section className=" text-white py-12 px-6" id="contact">
+    <section className="text-white py-12 px-6" id="contact">
       <div className="max-w-3xl mx-auto">
         <h2 className="text-3xl font-bold mb-6 text-center">
           Contact <span className="text-amber-400">Crown of Krishna</span>
@@ -72,4 +85,3 @@ export default function Contact() {
     </section>
   );
 }
-

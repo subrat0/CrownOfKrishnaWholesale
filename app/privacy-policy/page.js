@@ -29,7 +29,7 @@ const PrivacyPolicy = () => {
             At CrownOfKrishna, we value your privacy and are committed to protecting your personal information. This Privacy Policy outlines how we collect, use, and safeguard your data when you place orders on our website.
           </p>
           <ul className="list-disc pl-5 text-gray-300 text-sm mt-4 space-y-2">
-            <li><strong>Information Collection:</strong> We collect personal information such as your name, phone number, and delivery address solely for the purpose of processing and fulfilling your orders. This information is stored securely in your browser's local storage.</li>
+            <li><strong>Information Collection:</strong> We collect personal information such as your name, phone number, and delivery address solely for the purpose of processing and fulfilling your orders. This information is stored securely in your browser&apos;s local storage.</li>
             <li><strong>Use of Information:</strong> Your data is used to process orders, communicate order updates, and ensure timely delivery. We do not share your personal information with third parties except as necessary for order fulfillment (e.g., delivery services).</li>
             <li><strong>Data Security:</strong> While we use local storage for a seamless ordering experience, we recommend clearing your browser data after use to ensure privacy. We do not store your data on our servers unless explicitly required for order processing.</li>
             <li><strong>Contact:</strong> For any privacy-related concerns, contact us at <a href="mailto:crownofkrishna@gmail.com" className="text-yellow-500 hover:underline cursor-pointer">crownofkrishna@gmail.com</a>.</li>

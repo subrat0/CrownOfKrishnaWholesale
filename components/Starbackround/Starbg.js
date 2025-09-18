@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
 export default function StarsBackground() {
+  
   const canvasRef = useRef(null);
 
   useEffect(() => {

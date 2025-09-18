@@ -12,21 +12,28 @@ const OrderNowPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedInfo, setEditedInfo] = useState({ name: "", phone: "", address: "" });
   const [errors, setErrors] = useState({ name: "", phone: "", address: "" });
+  const [isClient, setIsClient] = useState(false); // SSR safe
   const router = useRouter();
 
+  // Only run client-side
   useEffect(() => {
-    const order = JSON.parse(localStorage.getItem("orderDetails") || "{}");
-    // console.log("Order Details from localStorage:", order);
-    if (order.customerInfo) {
-      setOrderDetails(order);
-      setEditedInfo({
-        name: order.customerInfo.name || "",
-        phone: order.customerInfo.phone || "",
-        address: order.customerInfo.address || "",
-      });
-    }
-    setLoading(false);
+    setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (isClient) {
+      const order = JSON.parse(localStorage.getItem("orderDetails") || "{}");
+      if (order.customerInfo) {
+        setOrderDetails(order);
+        setEditedInfo({
+          name: order.customerInfo.name || "",
+          phone: order.customerInfo.phone || "",
+          address: order.customerInfo.address || "",
+        });
+      }
+      setLoading(false);
+    }
+  }, [isClient]);
 
   const validateInputs = () => {
     const newErrors = { name: "", phone: "", address: "" };
@@ -53,48 +60,31 @@ const OrderNowPage = () => {
   };
 
   const handleSaveEdit = () => {
-    if (!validateInputs()) {
-      return;
-    }
-    const updatedOrderDetails = {
-      ...orderDetails,
-      customerInfo: { ...editedInfo },
-    };
+    if (!validateInputs()) return;
+
+    const updatedOrderDetails = { ...orderDetails, customerInfo: { ...editedInfo } };
     setOrderDetails(updatedOrderDetails);
-    localStorage.setItem("orderDetails", JSON.stringify(updatedOrderDetails));
+    if (isClient) localStorage.setItem("orderDetails", JSON.stringify(updatedOrderDetails));
     setIsEditing(false);
     setErrors({ name: "", phone: "", address: "" });
   };
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
-    setEditedInfo({
-      ...editedInfo,
-      [name]: value,
-    });
-    setErrors({
-      ...errors,
-      [name]: "",
-    });
+    setEditedInfo({ ...editedInfo, [name]: value });
+    setErrors({ ...errors, [name]: "" });
     if (name === "phone" && value && !/^\d+$/.test(value)) {
-      setErrors((prev) => ({
-        ...prev,
-        phone: "Phone number must contain only numbers",
-      }));
+      setErrors((prev) => ({ ...prev, phone: "Phone number must contain only numbers" }));
     }
   };
 
   const handleConfirmOrder = async () => {
-    if (!orderDetails) {
-      // console.log("No order details found.");
-      return;
-    }
+    if (!orderDetails || !isClient) return;
+
     setIsConfirming(true);
     const { cartItems, customerInfo, messageNote, total } = orderDetails;
-    // console.log("Sending to API:", { cartItems, customerInfo, messageNote, total });
 
     try {
-      // console.log("Fetching API:", "/api/submit-order");
       const response = await fetch("/api/submit-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -110,41 +100,48 @@ const OrderNowPage = () => {
       });
 
       const responseData = await response.json();
-      // console.log("API Response:", responseData);
       if (response.ok && responseData.success) {
         setShowNotification(true);
         localStorage.removeItem("cart");
         localStorage.removeItem("orderDetails");
         setTimeout(() => router.push("/"), 3000);
       } else {
-        // console.error("API Error:", responseData.error);
         setIsConfirming(false);
       }
     } catch (error) {
-      // console.error("Fetch Error:", error.message);
       setIsConfirming(false);
     }
   };
 
   useEffect(() => {
     if (showNotification) {
-      const timer = setTimeout(() => {
-        setShowNotification(false);
-      }, 3000);
+      const timer = setTimeout(() => setShowNotification(false), 3000);
       return () => clearTimeout(timer);
     }
   }, [showNotification]);
 
-  if (loading) return <div className="text-center text-gray-300 min-h-screen bg-gray-900 text-2xl font-bold items-center justify-center flex">Loading...</div>;
-  if (!orderDetails) return <div className="text-center text-gray-300 min-h-screen w-fit p-4 font-bold items-center justify-center flex flex-col gap-3 mx-auto  ">
-    <span className="text-2xl">No order found..</span>
-    <span className="text-2xl">Your Previous Order Delivered soon..</span>
-    <Link href="/" className="text-white border bg-black px-4 py-2 rounded-2xl ">Explore More Products</Link>
-    </div>;
+  if (loading)
+    return (
+      <div className="text-center text-gray-300 min-h-screen bg-gray-900 text-2xl font-bold flex items-center justify-center">
+        Loading...
+      </div>
+    );
+
+  if (!orderDetails)
+    return (
+      <div className="text-center text-gray-300 min-h-screen w-fit p-4 font-bold flex flex-col gap-3 mx-auto items-center justify-center">
+        <span className="text-2xl">No order found..</span>
+        <span className="text-2xl">Your Previous Order Delivered soon..</span>
+        <Link href="/" className="text-white border bg-black px-4 py-2 rounded-2xl">
+          Explore More Products
+        </Link>
+      </div>
+    );
+
   const { cartItems, customerInfo, messageNote, total } = orderDetails;
 
   return (
-    <div className="min-h-screen  text-white p-4 md:p-10 relative">
+    <div className="min-h-screen text-white p-4 md:p-10 relative">
       {showNotification && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-80 z-50 animate-fade-in">
           <div className="text-center bg-gray-800 p-6 rounded-2xl shadow-lg transform animate-scale-in">
@@ -165,18 +162,13 @@ const OrderNowPage = () => {
           </div>
         </div>
       )}
+
       <h1 className="text-3xl font-bold mb-6 text-center cursor-pointer">Order Summary</h1>
       <div className="max-w-4xl mx-auto">
         <div className="border rounded-2xl bg-black p-4">
           {cartItems.map((item, index) => (
             <div key={index} className="flex items-center gap-4 border-b border-gray-700 py-4 cursor-pointer">
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={80}
-                height={80}
-                className="object-cover rounded-lg"
-              />
+              <Image src={item.image} alt={item.title} width={80} height={80} className="object-cover rounded-lg" />
               <div className="flex-1">
                 <h2 className="text-xl font-semibold">{item.title}</h2>
                 <p className="text-gray-300">{item.productdetail}</p>
@@ -191,6 +183,8 @@ const OrderNowPage = () => {
           <div className="mt-4 text-right">
             <p className="text-xl font-bold text-green-400 cursor-pointer">Total: ₹{total}</p>
           </div>
+
+          {/* Customer Details */}
           <div className="mt-4 flex flex-col md:flex-row md:items-start md:gap-4">
             <div className="flex-1">
               <h3 className="text-lg font-semibold">Customer Details</h3>
@@ -274,6 +268,7 @@ const OrderNowPage = () => {
             )}
           </div>
         </div>
+
         <div className="mt-6 flex justify-center gap-4">
           <Link
             href="/cart"
