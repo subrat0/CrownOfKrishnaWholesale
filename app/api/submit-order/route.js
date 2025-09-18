@@ -6,7 +6,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const doc = new GoogleSpreadsheet(process.env.GOOGLE_SHEET_ID);
-
+//this route.js help to send data to the google sheets
     // Service Account Authentication with JWT
     const serviceAccountAuth = new JWT({
       email: process.env.GOOGLE_CLIENT_EMAIL,
