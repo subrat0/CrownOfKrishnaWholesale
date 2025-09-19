@@ -255,6 +255,7 @@ const OrderNowPage = () => {
                   <p>Phone: {customerInfo.phone}</p>
                   <p>Address: {customerInfo.address}</p>
                   {messageNote && <p>Note: {messageNote}</p>}
+                  <p className="text-xl font-bold text-red-500">Free Delivery on your order! Just shop for ₹20,000 or more!</p>
                 </div>
               )}
             </div>

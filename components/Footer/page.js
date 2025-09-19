@@ -54,7 +54,7 @@ const Footer = () => {
             <h3 className="text-lg font-semibold text-amber-50 mb-4">Connect With Us</h3>
             <div className="flex gap-4">
               <a
-                href="https://facebook.com/crownofkrishna"
+                href="https://www.facebook.com/share/1EnpaP25qu/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-gray-300 hover:text-yellow-500 transition cursor-pointer"
